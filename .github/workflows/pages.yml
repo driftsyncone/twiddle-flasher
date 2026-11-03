@@ -1,0 +1,84 @@
+# NOT RUN, NOT PUSHED (drafted locally). Assembles the flasher site from the release assets of the firmware repo
+# (default driftsyncone/twiddle) and deploys it with GitHub Pages "deploy from Actions".
+# A release in another repo cannot trigger this workflow, so it is started by hand (workflow_dispatch) or by a
+# repository_dispatch event of type 'firmware-release' (client_payload: {"repo": "owner/name", "tag": "vX.Y.Z"}).
+# Release asset convention (per release tag vX.Y.Z[-pre]): *.parts.json + the part .bin files (tools/dist.sh), SHA256SUMS,
+# tested.json and notes.md (maintainer-written), licenses-<board-id>.tar.gz (gen_notices.py --out, tarred).
+# All actions are pinned to full commit SHAs (tag in the comment, verified against the tag refs on 2026-11-02).
+name: pages
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Firmware repo (owner/name)
+        required: true
+        default: driftsyncone/twiddle
+      tag:
+        description: Release tag to publish (e.g. v2.0.0)
+        required: true
+  repository_dispatch:
+    types: [firmware-release]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+env:
+  SOURCE_REPO: ${{ inputs.repo || github.event.client_payload.repo || 'driftsyncone/twiddle' }}
+  RELEASE_TAG: ${{ inputs.tag || github.event.client_payload.tag }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Validate inputs
+        run: |
+          set -eu
+          printf '%s' "$SOURCE_REPO" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$' || { echo "bad repo"; exit 1; }
+          printf '%s' "$RELEASE_TAG" | grep -Eq '^v[0-9][A-Za-z0-9._-]*$' || { echo "bad tag"; exit 1; }
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests
+      - name: Download release assets and verify SHA256SUMS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          mkdir -p releases
+          # The requested tag must be a published release; other published releases are kept so older versions stay on the site.
+          tags=$(gh release list --repo "$SOURCE_REPO" --limit 100 --json tagName,isDraft -q '.[] | select(.isDraft|not) | .tagName')
+          echo "$tags" | grep -Fxq "$RELEASE_TAG" || { echo "release $RELEASE_TAG not found (or draft) in $SOURCE_REPO"; exit 1; }
+          for tag in $tags; do
+            ver=${tag#v}
+            mkdir -p "releases/$ver"
+            gh release download "$tag" --repo "$SOURCE_REPO" --dir "releases/$ver"
+            [ -s "releases/$ver/SHA256SUMS" ] || { echo "$tag: SHA256SUMS missing"; exit 1; }
+            (cd "releases/$ver" && sha256sum -c SHA256SUMS)
+            for t in releases/$ver/licenses-*.tar.gz; do
+              [ -e "$t" ] || continue
+              name=$(basename "$t" .tar.gz); mkdir -p "releases/$ver/$name"; tar -xzf "$t" -C "releases/$ver/$name"; rm "$t"
+            done
+          done
+      - name: Assemble (refuses untested, mismatched or licence-less versions)
+        run: scripts/assemble.sh releases dist
+      - name: Relocate base URL for this Pages site
+        run: scripts/relocate.sh dist "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/" "https://github.com/${SOURCE_REPO}"
+      - name: Check site
+        run: python3 scripts/check_site.py dist
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twiddle web flasher</title>
+<meta name="description" content="Install Twiddle, touchscreen remote-control firmware for ESP32 display boards, from your browser.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the installer</a>
+<div class="wrap">
+<header class="site">
+  <h1>Twiddle web flasher</h1>
+  <button type="button" id="theme" aria-label="Colour theme: automatic. Activate to change.">Theme: auto</button>
+</header>
+
+<main id="main">
+  <div class="notice warn" role="note">
+  <p><strong>Unofficial project, provided as is, with no warranty or guarantee of any kind.</strong> Not made, endorsed or supported by Autoblow, Lovense, Kiiroo, Research &amp; Desire, or any product or company named Twiddle, and not affiliated with them. Names are used only to describe compatibility.</p>
+  <ul>
+    <li>No warranty or guarantee of any kind. Use at your own risk.</li>
+    <li>For adults only, and only with the consent of everyone involved.</li>
+    <li>Not a medical device. Any heart-rate or edging feature is not a monitoring or medical function; do not rely on it for health.</li>
+    <li>Software and wireless links can fail. Always keep a way to stop the device that you can reach by hand.</li>
+    <li>Flashing a board is at your own risk: it can fail, brick the board or void the maker's warranty.</li>
+  </ul>
+  </div>
+  <p>Twiddle is device software for a touchscreen remote that controls adult toys. It runs on ESP32 display boards. It is free, source-available and for non-commercial use. This page installs it onto a board connected to your computer by USB. <strong>You must be 18 or older.</strong></p>
+  <p><a id="source-link" href="#">Source code</a> &middot; <a href="licenses/">Licences and notices</a></p>
+
+  <section aria-labelledby="h-browser">
+    <h2 id="h-browser">1. Check your browser</h2>
+    <div id="browser-status" class="notice" role="status" aria-live="polite">Checking your browser&hellip;</div>
+    <noscript><div class="notice danger">This page needs JavaScript to list boards and to flash. Nothing is sent to any server: files are downloaded from this site and written to your board through your browser.</div></noscript>
+  </section>
+
+  <section aria-labelledby="h-tested">
+    <h2 id="h-tested">Tested images only</h2>
+    <div class="notice warn">
+      A version is listed here only after the maintainer has installed that exact image on a real board of that model and ticked a test checklist. Boards and board revisions that have not been tested are shown as unavailable or marked untested. Flashing replaces the software on your board. You do this at your own risk, and you should not use it on a board you cannot afford to lose.
+    </div>
+  </section>
+
+  <section aria-labelledby="h-board">
+    <h2 id="h-board">2. Choose your board</h2>
+    <p id="board-hint">Pick the model written on the back of your board. If you are not sure, read the identification help inside each card before you flash.</p>
+    <ul class="cards" id="cards"></ul>
+    <p id="load-error" class="notice danger" hidden></p>
+  </section>
+
+  <section id="installer" class="panel" aria-labelledby="h-install" hidden>
+    <h2 id="h-install" tabindex="-1" style="margin-top:0">3. Install</h2>
+    <div id="board-info"></div>
+
+    <details id="dlmode">
+      <summary>If the board is not found: download mode (BOOT and RESET)</summary>
+      <ul id="dlmode-list"></ul>
+      <p><img id="board-photo" alt="" style="max-width:20rem;width:100%;height:auto"> <span id="photo-note" class="badge" hidden>Placeholder photo</span></p>
+    </details>
+
+    <fieldset>
+      <legend>Version</legend>
+      <label for="version">Version to install</label>
+      <select id="version"></select>
+      <p id="version-meta" class="badge-row"></p>
+      <details><summary>What is new in this version</summary><pre id="changelog" tabindex="0"></pre></details>
+    </fieldset>
+
+    <fieldset>
+      <legend>Install mode</legend>
+      <div class="choice"><input type="radio" name="mode" id="mode-new" value="new" checked>
+        <label for="mode-new" style="margin:0"><strong>New install (erases everything)</strong><br>
+        Use this for a board that has never run Twiddle, or when something is wrong. It writes every part and offers to erase the whole flash first. That removes Wi-Fi details, device tokens and any other software on the board. Back up first if the board runs other firmware.</label></div>
+      <div class="choice"><input type="radio" name="mode" id="mode-update" value="update">
+        <label for="mode-update" style="margin:0"><strong>Update (keeps settings)</strong><br>
+        Use this to go to a newer version on a board that already runs Twiddle. It writes only the application and leaves your settings alone. If the board runs something else, or the update does not start, choose New install.</label></div>
+      <p id="update-warn" class="notice danger" hidden>Update is selected. In the next window, <strong>leave "Erase device" unticked</strong>. Ticking it erases the settings, Wi-Fi details and device tokens stored on the board, <strong>and the board will not start afterwards</strong> (an Update does not rewrite the boot files); if that happens, run <strong>New install</strong> with "Erase device" ticked.</p>
+      <p id="mode-warn" class="notice danger" hidden>New install is selected. In the next window, tick "Erase device" only if you accept losing everything stored on the board.</p>
+    </fieldset>
+
+    <div id="caution" class="notice warn" hidden></div>
+    <ul id="board-notes" hidden></ul>
+
+    <p id="p4-note" class="notice" hidden>The ESP32-P4 board's Wi-Fi and Bluetooth radio is a separate ESP32-C6 chip with its own firmware. It is not part of this install, and factory C6 firmware can be too old to join Wi-Fi. See <code>docs/c6-firmware.md</code> in the Twiddle P4 firmware repository.</p>
+
+    <div id="install-slot">
+      <p>Connect the board with a USB data cable, then press the button. Your browser will ask you to pick the serial port.</p>
+      <p>
+        <esp-web-install-button id="install-button" manifest="">
+          <button slot="activate" type="button" class="primary">Install Twiddle</button>
+          <span slot="unsupported" class="notice danger">This browser cannot flash. Use desktop Chrome or Edge.</span>
+          <span slot="not-allowed" class="notice danger">Flashing needs HTTPS (or localhost).</span>
+        </esp-web-install-button>
+      </p>
+    </div>
+
+    <h3>After the install</h3>
+    <ol>
+      <li><strong>When the installer says "All done", power-cycle the board:</strong> press RESET, or unplug the USB cable and plug it back in. Some boards (tested: the ESP32-P4 over its USB-C port) stay in download mode after a flash and do not start the new firmware until you do. After that the board starts. On a new install the screen asks you to connect to Wi-Fi: tap <strong>Scan</strong>, pick your network, type its password and tap <strong>Save &amp; restart</strong>. (The Autoblow token and Bluetooth toys are set up later, on the Settings and Devices tabs.) The board also opens its own Wi-Fi network called <code>Twiddle-Setup</code> (password <code>twiddle-setup</code>) as a fallback.</li>
+      <li><strong>Fallback, if the screen is black or garbled or you prefer your phone:</strong> join that network with your phone and open <code>http://192.168.4.1/setup</code>. Check the form fields before you save: a phone browser may refill old Wi-Fi or token values from an earlier setup.</li>
+      <li>Choose your Wi-Fi network and, if you use one, the device token. Change the Display setting only if the screen is black or wrong. <strong>ESP32-P4:</strong> the default has driven both <code>_I_W_Y</code> units we tried, and the other choices are untested alternatives. <strong>Guition ESP32-S3:</strong> the setting is "Display pixel clock" (most units 16 MHz, a few 14 MHz); after the restart the panel shows a <strong>Keep</strong> button: tap it if the picture is right. If you cannot tap it, switch the panel off and on three times and it returns to the previous value.</li>
+      <li>The password for the board's own web page (user <code>ota</code>) is shown only on the board's own screen, on the Settings tab under "Web login". The setup page does not show it. Write it down; you need it to update over Wi-Fi later. If your version's notes say something different, the notes win.</li>
+      <li><strong>When you are finished, close this flasher tab (or unplug the board).</strong> Chrome keeps the serial port locked after a flash for as long as this page is open. Other tools (esptool, a serial monitor, another flasher tab) then fail with "port busy" or "access denied" until you close the tab or unplug the board.</li>
+    </ol>
+
+    <h3>Files in this version</h3>
+    <p><a id="sums-link" href="#">SHA256SUMS</a> &middot; <a id="lic-link" href="#">Licences and source for this build</a></p>
+    <div style="overflow-x:auto"><table id="files"><thead><tr><th scope="col">Part</th><th scope="col">Offset</th><th scope="col">Size</th><th scope="col">SHA-256</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="troubleshooting" aria-labelledby="h-trouble">
+    <h2 id="h-trouble">Troubleshooting</h2>
+    <p>Honest notes from the tests so far. Only one board model has been tried, so a fix below may not match every board.</p>
+    <dl>
+      <dt>The port is busy, or another program cannot open it</dt>
+      <dd>Chrome holds the serial port while this page is open, also after the flash is done. Close the flasher tab, or unplug the board and plug it back in. If it is still busy, close the other tab or program that has the port open (a serial monitor, esptool, a second browser window).</dd>
+      <dt>The board is not found, or the installer cannot connect</dt>
+      <dd>Use a USB data cable (many cables only charge) in the USB-C port named for your board. Then put the board in download mode: open "If the board is not found" in step 3 and follow it (hold BOOT, tap RESET, release BOOT). Unplug other serial devices so you pick the right port in the list.</dd>
+      <dt>Guition ESP32-S3: no serial port is listed, or the installer cannot connect</dt>
+      <dd>This board talks to the computer through a CH340 USB-serial chip. On some Windows versions that needs the WCH CH340 driver; install it and re-plug the board. Use a USB data cable and close other programs that use the port. We have not verified which Windows versions install the driver on their own, and the BOOT/RESET button positions shown for this board are not verified yet.</dd>
+      <dt>The installer says "All done" but nothing starts; the board stays in download mode</dt>
+      <dd>This happens on the ESP32-P4 board. Press RESET, or unplug the USB cable and plug it back in. The board then starts the new firmware.</dd>
+      <dt>The screen stays black after the flash</dt>
+      <dd>First wait about a minute and power-cycle the board once. If the backlight is on but the picture is black or wrong, join the <code>Twiddle-Setup</code> Wi-Fi network (password <code>twiddle-setup</code>), open <code>http://192.168.4.1/setup</code> and use "My screen looks wrong" to pick the display type (Guition ESP32-S3: change "Display pixel clock"). If the screen is black and the board does not even offer <code>Twiddle-Setup</code>, flash again with New install. We do not yet know every cause of a black screen on boards that were not tested.</dd>
+      <dt>My settings (Wi-Fi, device token) are gone after an Update</dt>
+      <dd>An Update keeps them only if "Erase device" stays unticked in the installer window. If you ticked it, the whole flash was erased, including your settings. They cannot be recovered. An Update does not rewrite the boot files, so after an erase the board stays black until you run <strong>New install</strong> (Erase ticked); then set Wi-Fi up again on its screen. A New install always asks about erasing as well: tick it only if you accept losing everything on the board.</dd>
+      <dt>The board does not boot at all after a flash or an interrupted flash</dt>
+      <dd>Put the board in download mode (see above) and run New install with "Erase device" ticked. That rewrites every part and normally brings the board back. If the flash is interrupted by a cable or browser problem, simply repeat it.</dd>
+      <dt>How do I restore my previous software?</dt>
+      <dd>A web flash replaces what was on the board and this page cannot bring it back. If the board ran other software, only your own backup (for example from esptool <code>read_flash</code>) can restore it, so make one before you flash. To go back to an older Twiddle version, pick it in the Version list and use New install.</dd>
+    </dl>
+  </section>
+
+  <section aria-labelledby="h-support">
+    <h2 id="h-support">Supported and unsupported variants</h2>
+    <p>Only the models shown above are covered. Other versions of these boards (a different panel, a resistive or non-touch version, a newer chip revision) may not work. Nothing here has been tested on them.</p>
+  </section>
+</main>
+
+<footer>
+  <p>Twiddle is a free, non-commercial open-source project, not affiliated with other products or companies named Twiddle.</p>
+  <p>Twiddle is not affiliated with any toy maker. Product names belong to their owners. The flasher uses <a href="vendor/esp-web-tools/VENDOR.md">esp-web-tools</a> (Apache-2.0), served from this site; no third-party scripts are loaded. <a href="licenses/">Licences and notices</a>: Twiddle's own code is CC BY-NC-SA 4.0; third-party components keep their own licences; the ESP32-S3 image also carries an LGPL additional permission.</p>
+  <p>Feature requests and bug reports: <a href="https://github.com/driftsyncone/twiddle/issues">GitHub Issues</a>, one issue per request. Welcome, but no promise of a reply, a timeline or support. Never include tokens, Wi-Fi passwords or other secrets.</p>
+</footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

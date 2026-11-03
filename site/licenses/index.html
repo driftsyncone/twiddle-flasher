@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Licences and notices - Twiddle web flasher</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap">
+<p><a href="../">Back to the flasher</a></p>
+<h1>Licences and notices</h1>
+
+<h2>Twiddle firmware</h2>
+<p>The Twiddle source code written for this project is licensed under CC BY-NC-SA 4.0. That licence covers only code written for Twiddle. The firmware images also contain third-party components. Each keeps its own licence, listed with the full licence texts for every released version below. Nothing in the CC BY-NC-SA terms limits the rights those licences give you.</p>
+<p>The ESP32-P4 images contain no GPL or LGPL component. This is checked for every release from the linker map and the sources of everything linked (<code>scripts/gen_notices.py --check</code>). Source for each release is the tag in the repository linked from the <a id="src" href="#">main page</a>.</p>
+
+<h2>Additional permission (LGPL components, draft)</h2>
+<p>DRAFT, not read by a lawyer. The ESP32-S3 firmware statically links LGPL-2.1+ parts of Arduino-ESP32. For it, the copyright holder additionally permits every recipient, for the sole purpose of exercising LGPL-2.1 section 6 rights, to modify the combined firmware, replace the LGPL components with modified versions and relink, run the result and reverse engineer it to debug those modifications, for their own use, notwithstanding the NonCommercial condition. This does not allow distribution or commercial exploitation of Twiddle code. The full paragraph is in LICENSE-NOTES.md in the firmware repositories and in the written offer shipped with each S3 release. The ESP32-P4 image links no LGPL component.</p>
+
+<h2>Notices per released version</h2>
+<div id="list"><p>Loading&hellip;</p></div>
+
+<h2>This web page</h2>
+<p>The page code in this site (HTML, CSS, JavaScript, generator scripts) is licensed under Apache-2.0. The flasher button is <a href="../vendor/esp-web-tools/VENDOR.md">esp-web-tools</a> (Apache-2.0) built unmodified from a pinned commit, with its dependencies; their licence texts are in <a href="../vendor/esp-web-tools/licenses/">vendor/esp-web-tools/licenses</a> and <a href="../vendor/esp-web-tools/LICENSE">LICENSE</a>.</p>
+<noscript><p>The list above needs JavaScript. The files live at <code>licenses/&lt;board&gt;/&lt;version&gt;/</code>.</p></noscript>
+</div>
+<script>
+(function () {
+  "use strict";
+  fetch("../index.json").then(function (r) { return r.json(); }).then(function (d) {
+    var box = document.getElementById("list");
+    box.textContent = "";
+    var any = false;
+    d.boards.forEach(function (b) {
+      if (!b.versions.length) return;
+      any = true;
+      box.appendChild(Object.assign(document.createElement("h3"), { textContent: b.name }));
+      var ul = document.createElement("ul");
+      b.versions.forEach(function (v) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = b.id + "/" + v.version + "/";
+        a.textContent = "Version " + v.version;
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+    });
+    if (!any) box.textContent = "No version has been published yet.";
+  }).catch(function () { document.getElementById("list").textContent = "Could not load the version list."; });
+  fetch("../config.json").then(function (r) { return r.json(); }).then(function (c) { if (c.source_url) document.getElementById("src").href = c.source_url; }).catch(function () {});
+})();
+</script>
+</body>
+</html>

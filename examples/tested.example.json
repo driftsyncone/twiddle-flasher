@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "version": "2.0.0",
+  "tested": [
+    {
+      "board": "guition-jc1060p470c",
+      "chip_rev": "v1.3",
+      "date": "2026-11-20",
+      "tester": "your name",
+      "app_sha256": "sha256 of the app image you flashed and tested (twiddle-p4-<ver>.bin)",
+      "variants_tested": ["V2", "_I_W_Y"],
+      "checklist": { "boots": true, "setup_portal": true, "wifi_join": true, "ota_from_previous": true }
+    }
+  ]
+}

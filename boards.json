@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "project": "Twiddle",
+  "leak_scan": {
+    "patterns": ["192\\.168\\.\\d{1,3}\\.\\d{1,3}", "/home/[a-z]+/", "[A-Za-z0-9-]+\\.lan\\b"],
+    "allow": ["192.168.4.1"]
+  },
+  "boards": [
+    {
+      "id": "guition-jc1060p470c",
+      "name": "Guition JC1060P470C (ESP32-P4, 7 inch)",
+      "short": "Guition JC1060P470C",
+      "chipFamily": "ESP32-P4",
+      "serialType": "cdc",
+      "status": "available",
+      "nvs_region": [36864, 61440],
+      "parts_layout": {"bootloader": 8192, "partition-table": 32768, "otadata": 61440, "app": 131072},
+      "update_parts": ["otadata", "app"],
+      "app_max_size": 3145728,
+      "photo": "img/placeholder-p4.svg",
+      "photo_is_placeholder": true,
+      "summary": "7 inch 1024x600 touch panel with an ESP32-P4. Native USB (shows up as USB JTAG/serial).",
+      "identify": [
+        "Rear label reads JC1060P470C. Newer stock has a V2 after the material number.",
+        "A black plastic shell with no rear label is the _I_W_Y version.",
+        "Both use the same firmware. If the screen stays black after the first start, pick your panel in the setup portal (Display setting)."
+      ],
+      "variants": [
+        {"id": "v2", "label": "V2 panel", "hint": "Label shows V2. The default Display setting is the V2 table, but it has been verified only on two _I_W_Y units, not yet on a unit with a V2 label."},
+        {"id": "iwy", "label": "_I_W_Y (black shell, no label)", "hint": "Same image. The default Display setting drove both units we tried; if the screen is black or the colours are wrong, try the new panel in the setup portal (untested alternative)."}
+      ],
+      "port_hint": "Use the USB-C port marked for the P4 (native USB). It must be a data cable.",
+      "download_mode": [
+        "Plug the board in and try the install button first. Most boards enter download mode on their own.",
+        "If it cannot connect: hold BOOT, tap RESET, release BOOT, then try again.",
+        "Check the BOOT and RESET button positions on your board before relying on this (the photo is a placeholder)."
+      ],
+      "caution": "Tested on ESP32-P4 chip revision v1.3 only. Chip revision 3.0 is not supported."
+    },
+    {
+      "id": "guition-jc8048w550c",
+      "name": "Guition JC8048W550C (ESP32-S3, 5 inch)",
+      "short": "Guition JC8048W550C",
+      "chipFamily": "ESP32-S3",
+      "serialType": "uart",
+      "status": "available",
+      "nvs_region": [36864, 57344],
+      "parts_layout": {"bootloader": 0, "partition-table": 32768, "boot_app0": 57344, "app": 65536},
+      "update_parts": ["boot_app0", "app"],
+      "app_max_size": 6553600,
+      "photo": "img/placeholder-s3.svg",
+      "photo_is_placeholder": true,
+      "summary": "5 inch 800x480 capacitive touch panel with an ESP32-S3 and a CH340 USB-serial chip. Needs a USB data cable; Windows may need the CH340 driver.",
+      "identify": [
+        "Silkscreen on the board reads JC8048W550C (the C is for capacitive touch). The R (resistive) and N (no touch) versions are not supported.",
+        "The USB-C port is wired to a CH340 USB-serial chip (it shows up as a serial port, not as a USB JTAG/serial device). The board has an ESP32-S3 module marked N16R8 (16 MB flash, 8 MB PSRAM). Other memory sizes are not supported.",
+        "Units of this board differ in the display pixel clock they need (most 16 MHz, a few 14 MHz). If the screen shows a colour pattern or shakes after the first start, change it in the setup page (see below)."
+      ],
+      "variants": [],
+      "port_hint": "The CH340 serial chip needs a driver on some Windows versions (the browser then lists no port, or the wrong one). Install the WCH CH340 driver from the chip maker's site if the port does not appear; macOS and Linux normally need nothing. Use a USB data cable. Which Windows versions install the driver by themselves is not verified.",
+      "download_mode": [
+        "Plug the board in and try the install button first: the CH340 board normally resets into download mode automatically.",
+        "If it cannot connect: hold BOOT, tap RESET, release BOOT, then try again.",
+        "UNVERIFIED: where the BOOT and RESET buttons are on this board, and whether the automatic reset works from the browser, have not been checked on a real board yet. Check the silkscreen on your board before relying on this (the picture is a placeholder)."
+      ],
+      "caution": "If the screen shows a colour pattern (white, red, green, blue, black in turn) or shakes after the first start, join Twiddle-Setup, open the setup page and change \"Display pixel clock\" (most units 16 MHz, a few 14 MHz). After the restart the panel shows a Keep button: tap it if the picture is right. If you cannot tap it, switch the panel off and on three times and it goes back to the previous value.",
+      "notes": [
+        "The firmware for this board contains the Arduino-ESP32 libraries under the LGPL-2.1. The licence page for each version lists them and links the source and the rebuild instructions.",
+        "Flashing over the CH340 may take a few minutes; do not unplug the board while the installer is working. (Time not measured.)"
+      ]
+    },
+    {
+      "id": "waveshare-esp32-s3-touch-lcd-5",
+      "name": "Waveshare ESP32-S3-Touch-LCD-5",
+      "short": "Waveshare S3 Touch LCD 5",
+      "chipFamily": "ESP32-S3",
+      "serialType": "cdc",
+      "status": "unavailable",
+      "unavailable_reason": "Not yet available: the firmware compiles for this board but has not been tested on one.",
+      "photo": "img/placeholder-s3.svg",
+      "photo_is_placeholder": true,
+      "summary": "5 inch 800x480 board with an ESP32-S3. The 5B (1024x600) and non-touch versions are not supported.",
+      "identify": ["Product name ESP32-S3-Touch-LCD-5 on the board. The 5B variant has a 1024x600 panel and is not supported."],
+      "variants": [],
+      "download_mode": ["Hold BOOT while plugging in the USB cable."]
+    }
+  ]
+}

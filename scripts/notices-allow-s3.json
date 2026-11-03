@@ -1,0 +1,42 @@
+{
+  "_comment": "Reviewed statements for scripts/gen_notices_pio.py (the ESP32-S3 / PlatformIO / Arduino-ESP32 image). Every entry carries a written reason. NOT legal advice.",
+  "lgpl_reviewed": [
+    {"group": "arduino:core", "reason": "Arduino-ESP32 core (libFrameworkArduino): LGPL-2.1-or-later per the framework package (package.json) and the file headers; esp32-hal-* files carry Apache-2.0 headers. Statically linked: the LGPL-2.1 section 6 obligations apply (corresponding source, ability to relink)."},
+    {"group": "arduino:lib:WiFi", "reason": "Arduino-ESP32 library, LGPL-2.1-or-later (headers). Statically linked."},
+    {"group": "arduino:lib:Network", "reason": "Arduino-ESP32 library, LGPL-2.1-or-later (headers) with some Apache-2.0 files. Statically linked."},
+    {"group": "arduino:lib:WebServer", "reason": "Arduino-ESP32 library, LGPL-2.1-or-later (headers); files without a header are treated as LGPL (conservative). Statically linked."},
+    {"group": "arduino:lib:FS", "reason": "Arduino-ESP32 library, LGPL-2.1-or-later (header) next to Apache-2.0 files. Statically linked."},
+    {"group": "arduino:lib:SPI", "reason": "Arduino-ESP32 library, LGPL-2.1-or-later (header). Statically linked."},
+    {"group": "arduino:lib:Wire", "reason": "Arduino-ESP32 library, LGPL-2.1-or-later (header). Statically linked."},
+    {"group": "arduino:lib:AsyncUDP", "reason": "Arduino-ESP32 library; its file has no licence header, so it is treated as LGPL-2.1-or-later like the rest of the package (conservative). Statically linked."},
+    {"group": "arduino:lib:DNSServer", "reason": "Arduino-ESP32 library; its file has no licence header, so it is treated as LGPL-2.1-or-later like the rest of the package (conservative). Statically linked."},
+    {"group": "arduino:lib:Update", "reason": "Arduino-ESP32 library; one file Apache-2.0, one without a header (treated as LGPL-2.1-or-later, conservative). Statically linked."}
+  ],
+  "gpl_reviewed": [],
+  "idf_component_alias": {
+    "mbedcrypto": "mbedtls", "mbedx509": "mbedtls", "mbedtls_2": "mbedtls", "xt_hal": "xtensa"
+  },
+  "idf_copyleft_reviewed": [
+    {"component": "wpa_supplicant", "label": "GPL (header text)", "status": "reviewed", "reason": "hostap/wpa_supplicant files carry the old BSD/GPL-2 dual header ('Alternatively, this software may be distributed under the terms of BSD license'). The component's own COPYING/README state: previously BSD/GPL v2 dual, and since 2012-02-11 the project uses only the BSD licence. Used under the BSD option; checked by reading COPYING, README and one header. NOT checked file by file."}
+  ],
+  "idf_managed": {
+    "espressif__mdns": {"version": "from framework-arduinoespressif32-libs/versions.txt", "licence": "Apache-2.0"},
+    "espressif__network_provisioning": {"version": "from versions.txt", "licence": "Apache-2.0"},
+    "espressif__esp_diagnostics": {"version": "from versions.txt", "licence": "Apache-2.0"},
+    "espressif__cjson": {"version": "from versions.txt", "licence": "MIT"},
+    "joltwallet__littlefs": {"version": "from versions.txt", "licence": "BSD-3-Clause"}
+  },
+  "blobs": [
+    {"archive": "phy", "what": "RF PHY calibration (esp_phy/lib/esp32s3/libphy.a)", "licence": "Apache-2.0 per esp_phy/lib/README.rst", "component": "esp_phy"},
+    {"archive": "btbb", "what": "Bluetooth baseband (esp_phy/lib/esp32s3/libbtbb.a)", "licence": "Apache-2.0 per esp_phy/lib/README.rst", "component": "esp_phy"},
+    {"archive": "net80211", "what": "Wi-Fi 802.11 stack (esp_wifi/lib/esp32s3)", "licence": "Apache-2.0 per esp_wifi/lib/README.rst", "component": "esp_wifi"},
+    {"archive": "pp", "what": "Wi-Fi packet processing (esp_wifi/lib/esp32s3)", "licence": "Apache-2.0 per esp_wifi/lib/README.rst", "component": "esp_wifi"},
+    {"archive": "core", "what": "Wi-Fi core (esp_wifi/lib/esp32s3)", "licence": "Apache-2.0 per esp_wifi/lib/README.rst", "component": "esp_wifi"},
+    {"archive": "mesh", "what": "Wi-Fi mesh (esp_wifi/lib/esp32s3)", "licence": "Apache-2.0 per esp_wifi/lib/README.rst", "component": "esp_wifi"},
+    {"archive": "smartconfig", "what": "Wi-Fi SmartConfig (esp_wifi/lib/esp32s3)", "licence": "Apache-2.0 per esp_wifi/lib/README.rst", "component": "esp_wifi"},
+    {"archive": "espnow", "what": "ESP-NOW (esp_wifi/lib/esp32s3)", "licence": "Apache-2.0 per esp_wifi/lib/README.rst", "component": "esp_wifi"},
+    {"archive": "coexist", "what": "Wi-Fi/Bluetooth coexistence (esp_coex/lib/esp32s3)", "licence": "Apache-2.0 (esp_coex/lib LICENSE; README not read)", "component": "esp_coex"},
+    {"archive": "btdm_app", "what": "Bluetooth controller (bt/controller/lib_esp32c3_family/esp32s3/libbtdm_app.a)", "licence": "Apache-2.0 per bt/controller/lib_esp32c3_family/README.md", "component": "bt"}
+  ],
+  "blob_note": "Verified: the LICENSE file of each of these library folders is the plain Apache-2.0 text (sha256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 in ESP-IDF 5.5.5) and the folder README.rst/README.md says the binaries are 'provided under the same license as the parent esp-idf project - the Apache License 2.0 ... (The license text refers to this as \"Object\" form.)'. NOT verified: that Espressif's statement covers every third-party part inside the binaries, and no legal reading. The binaries are linked as shipped by the pioarduino framework-arduinoespressif32-libs package; their source is not available to us."
+}

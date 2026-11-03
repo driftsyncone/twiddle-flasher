@@ -1,0 +1,48 @@
+{
+  "_comment": "Reviewed exceptions for gen_notices.py --check. Every entry needs a written reason. status 'needs-review' passes but prints a WARNING until a human resolves it. 'match' is a case-insensitive substring of the finding key.",
+  "allow": [
+    {
+      "component": "espressif__esp_hosted",
+      "what": "licence-file",
+      "match": "LICENSES/GPL-2.0",
+      "status": "reviewed",
+      "reason": "esp_hosted ships a REUSE-style LICENSES/ folder holding the text of every licence used anywhere in its repository. GPL-2.0 applies to its Linux kernel-module host driver, which is not part of the ESP-IDF build. The source scan found no linked esp_hosted object that declares GPL."
+    },
+    {
+      "component": "gcc-runtime",
+      "what": "licence-file",
+      "match": "COPYING3",
+      "status": "reviewed",
+      "reason": "libgcc and libstdc++ are GPL-3.0-or-later WITH GCC-exception-3.1 (COPYING.RUNTIME): linking them into a program does not make the program GPL. The exception text is shipped with the notices."
+    },
+    {
+      "component": "gcc-runtime",
+      "what": "licence-file",
+      "match": "COPYING.RUNTIME",
+      "status": "reviewed",
+      "reason": "This file is the GCC Runtime Library Exception itself; it refers to the GPL by name."
+    },
+    {
+      "component": "newlib-libc",
+      "what": "licence-file",
+      "match": "COPYING.NEWLIB",
+      "status": "reviewed",
+      "reason": "Reviewed 2026-11-02 against esp-14.2.0_20241119 share/licenses/newlib/COPYING.NEWLIB. Its only GNU entries are (21) the FSF/glibc-derived LGPL files '*-linux* targets only' and (22) the Xavier Leroy LGPL files 'i[3456]86-*-linux* targets only'; this image is riscv32 bare-metal (ESP-IDF), so neither set is built into libc.a/libm.a for this target. The 133 libc/libm members the 2.0.0-p4.13 release link (stdio, string, strto*, dtoa/mprec, a few libm float functions) are the standard newlib set under BSD-style licences. NOT verified: the licence header of each of those 133 members individually (the archive holds objects, not sources); the claim rests on the target restriction in COPYING.NEWLIB and the member list. Re-run this review when the toolchain changes."
+    }
+  ],
+  "_comment_blobs": "'blobs' records prebuilt binaries and what was (and was not) verified about their licence. It is shown on the generated licence page. gen_notices.py FAILS if a prebuilt radio library is linked and no 'radio-blob' allow entry exists.",
+  "blobs": [
+    {
+      "name": "Wi-Fi / PHY / Bluetooth-controller radio libraries (ESP-IDF esp_phy/lib, esp_wifi/lib, bt/controller/lib_*)",
+      "licence": "LICENSE files in those folders (components/esp_phy/lib/LICENSE, components/esp_wifi/lib/LICENSE, components/bt/controller/lib_esp32c3_family/LICENSE) are the plain Apache-2.0 text, sha256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 in ESP-IDF 5.5.1; the bt/controller/lib_esp32c6/esp32c6-bt-lib/NOTICE is the Apache Mynewt NimBLE notice",
+      "in_p4_image": "none. The ESP32-P4 has no radio; Wi-Fi and Bluetooth run on the ESP32-C6 through esp-hosted. The linker map of the release build contains no archive from esp_phy, esp_wifi/lib or bt/controller (enforced by the check). The Bluetooth host stack (NimBLE, libbt.a) is built from Apache-2.0 source",
+      "reason": "These libraries matter only for the ESP32-S3 build (Arduino-ESP32). Verified: the licence file texts and hashes above. NOT verified: that the Apache-2.0 text in a folder of binaries is meant to cover those binaries (the files carry no separate redistribution terms we could find); no legal reading. Re-do this for the S3 release."
+    },
+    {
+      "name": "ESP32-C6 coprocessor firmware (esp-hosted slave, with Espressif's C6 Wi-Fi/PHY/BLE libraries)",
+      "licence": "esp-hosted 3.0.10: Apache-2.0 (LICENSES/Apache-2.0; its GPL-2.0 file belongs to the Linux kernel-module host driver, not used); the radio libraries inside it come from ESP-IDF as above",
+      "in_p4_image": "not in the published flash parts (bootloader, partition table, otadata, application). The web flasher does not write or replace the C6 firmware; the board's C6 runs the firmware it was shipped with or that its owner installed (docs/c6-firmware.md). The P4 image contains only the esp-hosted host side, built from source",
+      "reason": "If a future release ships a C6 image, its licences must be reviewed and listed separately. Verified: the P4 link map (no prebuilt .a from esp_hosted; all its archives are built from source in the managed component) and the managed component's LICENSES folder. NOT verified: the exact binary content of the C6 firmware on any particular board."
+    }
+  ]
+}
